@@ -18,3 +18,30 @@ steps:
     command: 'restore'
     projects: '**/WebApp.csproj'
     feedsToUse: 'select'
+    
+- task: DotNetCoreCLI@2
+  displayName: Build Web App
+  inputs:
+    command: 'build'
+    projects: '**/WebApp.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Run Unit test
+  inputs:
+    command: 'test'
+    projects: '**/*UnitTest*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Create Web Application Package (Webapp.zip)
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artificat (WebbApp.zip)
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
